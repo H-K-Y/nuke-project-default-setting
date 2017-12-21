@@ -29,7 +29,13 @@ Read raw data---------------------------------------------如果选中，Read节
 
 Write raw data--------------------------------------------如果选中，Write节点自动勾选raw data
 
+Retime automatically output to the project start frame----如果选中，创建的Retime节点会自动偏到工程设置的起始帧
+
 Rendering automatically create a rendering path-----------如果选中，Write节点在渲染时会判断渲染路径是否存在，若不存在会自动创建路径
+
+
+
+注意所有功能在设置完后要重启一次NUKE才能生效
 
 
 
