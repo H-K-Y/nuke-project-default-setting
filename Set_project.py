@@ -20,6 +20,7 @@ def Set_project():
         f.set("Set_project", "Viewer full_frame_processing", "False")
         f.set("Set_project", "Read raw data", "False")
         f.set("Set_project", "Write raw data", "False")
+        f.set("Set_project", "Retime automatically output to the project start frame", "False")
         f.set("Set_project", "Rendering automatically create a rendering path", "False")
 
         f.write(open(os.path.join(os.path.expanduser("~"),".nuke","Set_project.ini"),"w"))
@@ -36,10 +37,14 @@ def Set_project():
     nuke.knobDefault("Viewer.full_frame_processing",f.get("Set_project", "Viewer full_frame_processing"))
     nuke.knobDefault("Read.raw",f.get("Set_project", "Read raw data"))
     nuke.knobDefault("Write.raw",f.get("Set_project", "Write raw data"))
-    if f.get("Set_project", "Rendering automatically create a rendering path") == "False":
-        pass
-    else:
+    nuke.knobDefault("Write.raw", f.get("Set_project", "Retime automatically output to the project start frame"))
+
+    if panduan(f.get("Set_project", "Retime automatically output to the project start frame")):
+        nuke.addOnUserCreate(auto_retime)
+
+    if panduan(f.get("Set_project", "Rendering automatically create a rendering path")):
         nuke.addBeforeRender(chuangjian)
+
 
 
     menubar = nuke.menu("Nuke");
@@ -78,11 +83,12 @@ def Set_project_ui():
     p.addSingleLineInput("pixel aspect", f.get("Set_project", "pixel aspect"))
     p.addSingleLineInput("fps", f.get("Set_project", "fps"))
     p.addEnumerationPulldown("Write default channels"," ".join(Write_channels))
-    p.addEnumerationPulldown("Write MOV default encoding"," ".join(Write_codec.keys()))
+    p.addEnumerationPulldown("Write MOV default encoding"," ".join(sorted(Write_codec.keys())))
     p.addBooleanCheckBox('Write MOV automatically check "write time code"',panduan(f.get("Set_project", "Write mov write time code")))
     p.addBooleanCheckBox('Viewer automatically check "full_frame_processing"',panduan(f.get("Set_project", "Viewer full_frame_processing")))
     p.addBooleanCheckBox("Read raw data",panduan(f.get("Set_project", "Read raw data")))
     p.addBooleanCheckBox("Write raw data",panduan(f.get("Set_project", "Write raw data")))
+    p.addBooleanCheckBox("Retime automatically output to the project start frame", panduan(f.get("Set_project", "Retime automatically output to the project start frame")))
     p.addBooleanCheckBox("Rendering automatically create a rendering path",panduan(f.get("Set_project", "Rendering automatically create a rendering path")))
 
     if p.show() :
@@ -98,12 +104,12 @@ def Set_project_ui():
         f.set("Set_project", "Viewer full_frame_processing", str(p.value('Viewer automatically check "full_frame_processing"')))
         f.set("Set_project", "Read raw data", str(p.value("Read raw data")))
         f.set("Set_project", "Write raw data", str(p.value("Write raw data")))
+        f.set("Set_project", "Retime automatically output to the project start frame", str(p.value("Retime automatically output to the project start frame")))
         f.set("Set_project", "Rendering automatically create a rendering path", str(p.value("Rendering automatically create a rendering path")))
 
         f.write(open(os.path.join(os.path.expanduser("~"), ".nuke", "Set_project.ini"), "w"))
 
-    else:
-        pass
+
 
 
 
@@ -114,6 +120,8 @@ def panduan(a):
     else:
         return True
 
+
+
 def chuangjian():
     file = os.path.dirname(nuke.filename(nuke.thisNode()))
     if os.path.exists(file):
@@ -122,5 +130,9 @@ def chuangjian():
         os.makedirs(file)
 
 
+
+def auto_retime():
+    nuke.knobDefault("Retime.output.first_lock", "true")
+    nuke.knobDefault("Retime.output.first", str(int(nuke.Root()["first_frame"].value())))
 
 
