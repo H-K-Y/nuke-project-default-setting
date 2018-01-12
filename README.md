@@ -6,6 +6,7 @@ nuke默认参数设置
 用于改变nuke默认的工程大小，帧速率以及一些其他常用节点默认参数
 
 用法：把menu.py和Set_project.py下载放到.nuke文件夹，如果文件夹已存在menu.py文件，就把下载的menu.py文件里的代码复制粘贴到已存在的menu.py
+
 启动NUKE后在菜单栏最后找到Set the project default选项打开
 
 界面参数：
